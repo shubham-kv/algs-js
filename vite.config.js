@@ -9,6 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
+        "graph-dfs": resolve(__dirname, "./graph-dfs/index.html"),
       },
     },
   },
