@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster+Two:wght@400;700&display=swap');
+
+.font_lobster_two {
+  font-family: "Lobster Two", system-ui, Arial, sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -27,14 +35,21 @@ body {
   padding: 0 1.5rem;
 }
 
+.app_header {
+  display: flex;
+  justify-content: space-between;
+}
+
 .app_title {
   font-size: 2em;
   margin-block: 0.25em;
 }
 
-.app_title a {
-  text-decoration: inherit;
-  color: black;
+.app_nav_list {
+  display: flex;
+  list-style-type: none;
+  gap: 1.5rem;
+  padding: 0;
 }
 
 .app_content {
@@ -56,4 +71,55 @@ button:enabled:hover {
 
 button:enabled:active {
   transform: scale(0.95);
+}
+
+.link {
+	text-decoration: none;
+	position: relative;
+	transition: all 0.2s ease;
+}
+
+.link:link,
+.link:visited,
+.link:hover,
+.link:focus,
+.link:active {
+	text-decoration: none;
+	color: rgba(0, 0, 0, 0.38);
+}
+
+.link:hover,
+.link:focus {
+	color: rgba(0, 0, 0, 0.78);
+}
+
+.link::after {
+	content: '';
+	display: inline-block;
+	height: 1.5px;
+	
+	position: absolute;
+	left: 0%;
+	bottom: -10%;
+	background-color: hsl(0, 0%, 50%);
+}
+
+.link:hover::after {
+	left: 0%;
+	animation: Grow 0.2s ease-in 1 forwards;
+}
+
+.link:focus::after {
+	left: 0%;
+	transform: translateX(0%);
+	animation: Grow 0.2s ease-in 1 forwards;
+}
+
+@keyframes Grow {
+	0% {
+		width: 0%;
+	}
+	100% {
+		width: 100%;
+	}
 }
