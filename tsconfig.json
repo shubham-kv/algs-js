@@ -22,5 +22,5 @@
     "noUncheckedSideEffectImports": true,
     "checkJs": true
   },
-  "include": ["src"]
+  "include": ["src", "lib"]
 }
