@@ -1,6 +1,6 @@
 import { GraphEdge } from "./GraphEdge";
 import { GraphVertex } from "./GraphVertex";
-import { darkGrey, lightGrey } from "../../constants";
+import { lightGrey } from "../../constants";
 import { distance, type Point } from "../../utils/geometry";
 
 type GraphConfig = {
@@ -14,9 +14,8 @@ export class Graph {
   #adjList: number[][];
 
   #activeVertex: GraphVertex | undefined = undefined;
-  #drawingLoopHandle: number = 0
 
-  constructor(/** @type {GraphConfig} */ config: GraphConfig) {
+  constructor(config: GraphConfig) {
     this.vertices = config.vertices;
     this.edges = config.edges;
     this.#adjList = Array(this.vertices.length)
@@ -46,7 +45,6 @@ export class Graph {
         styles: {
           lineWidth: 3,
           strokeStyle: lightGrey,
-          visitedStrokeStyle: darkGrey,
         },
       })
     );
@@ -141,34 +139,5 @@ export class Graph {
     window.addEventListener("mouseup", unsetActiveVertex);
     window.addEventListener("touchend", unsetActiveVertex);
     window.addEventListener("touchcancel", unsetActiveVertex);
-  }
-
-  #drawLoop(canvas: HTMLCanvasElement) {
-    const r = canvas.getBoundingClientRect();
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      return;
-    }
-
-    ctx.clearRect(0, 0, r.width, r.height);
-
-    for (const edge of this.edges) {
-      edge.draw(ctx);
-    }
-    for (const vertex of this.vertices) {
-      vertex.draw(ctx);
-    }
-
-    this.#drawingLoopHandle = requestAnimationFrame(() => {
-      this.#drawLoop(canvas);
-    });
-  }
-
-  startDrawing(canvas: HTMLCanvasElement) {
-    this.#drawLoop(canvas);
-  }
-
-  stopDrawing() {
-    cancelAnimationFrame(this.#drawingLoopHandle);
   }
 }

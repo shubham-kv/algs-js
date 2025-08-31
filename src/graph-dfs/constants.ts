@@ -27,7 +27,6 @@ export const EDGES: [number, number][] = [
   [21, 24],
   [22, 23],
   [21, 23],
-  [21, 24],
 ];
 
 /** @type {{x: number; y: number}[]} */

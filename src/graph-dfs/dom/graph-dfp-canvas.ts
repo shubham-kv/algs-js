@@ -1,6 +1,6 @@
 import { GraphVertex, Graph, GraphDFP } from "../algorithm/depth-first-paths";
 
-import { setupHiDPICanvas } from "../utils/canvas";
+import { clearCanvas, setupHiDPICanvas } from "../utils/canvas";
 import {
   VERTICES_COUNT,
   RELATIVE_VERTEX_COORDS,
@@ -42,6 +42,7 @@ function createVertices(width: number, height: number): GraphVertex[] {
       x: RELATIVE_VERTEX_COORDS[i].x * width,
       y: RELATIVE_VERTEX_COORDS[i].y * height,
       radius: 16,
+      index: i,
       styles: {
         fillStyle: "white",
         lineWidth: 3,
@@ -64,29 +65,29 @@ function setupGraph(canvas: HTMLCanvasElement) {
     graph.addEdge(edge[0], edge[1]);
   }
   graph.addEventListeners(canvas);
-  graph.startDrawing(canvas);
-}
 
-function clearGraph() {
-  if (!graph) {return;}
-  graph.stopDrawing();
-
-  const r = canvas.getBoundingClientRect();
-  const ctx = canvas.getContext('2d');
-  ctx?.clearRect(0, 0, r.width, r.height);
+  graphDFP = new GraphDFP({ graph });
+  graphDFP.startDrawing(canvas);
 }
 
 export function startGraphDFPCanvasAnimation() {
-  graphDFP = new GraphDFP({ graph });
-  graphDFP?.startProcessing();
+  if (!graphDFP) {
+    throw new Error("Expected graphDFP object to be non-null");
+  }
+  graphDFP.startProcessing();
 }
 
 export function restartGraphDFPCanvasAnimation() {
   if (!canvas) {
-    initCanvas();
+    throw new Error("Expected canvas object to be non-null");
+  }
+  if (!graphDFP) {
+    throw new Error("Expected graphDFP object to be non-null");
   }
 
-  clearGraph();
+  graphDFP.stopProcessing();
+  graphDFP.stopDrawing();
+  clearCanvas(canvas);
   setupGraph(canvas);
   startGraphDFPCanvasAnimation();
 }
