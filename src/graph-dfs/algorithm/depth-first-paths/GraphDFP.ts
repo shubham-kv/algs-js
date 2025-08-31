@@ -2,6 +2,7 @@ import { Graph } from "./Graph";
 import { delay } from "../../utils/time";
 import { darkGrey } from "../../constants";
 import { clearCanvas } from "../../utils/canvas";
+import type { GraphVertex } from "./GraphVertex";
 
 type GraphDFPConfig = {
   graph: Graph;
@@ -16,8 +17,9 @@ export class GraphDFP {
   #marked: boolean[];
   #edgeTo: number[];
 
-  #drawingLoopHandle: number = 0
-  #shouldProcess: boolean = false;
+  #drawingLoopHandle: number = 0;
+  #shouldTraverse: boolean = false;
+  #vertexTraversed: GraphVertex | undefined
 
   constructor(config: GraphDFPConfig) {
     this.#graph = config.graph;
@@ -28,7 +30,7 @@ export class GraphDFP {
   }
 
   async #dfs(v: number) {
-    if (!this.#shouldProcess) {
+    if (!this.#shouldTraverse) {
       return;
     }
 
@@ -37,10 +39,11 @@ export class GraphDFP {
     }
 
     this.#marked[v] = true; // local array for fast access
+    this.#vertexTraversed = this.#graph.vertices[v];
     this.#graph.vertices[v].marked = true;
 
     for (const w of this.#graph.adjList(v)) {
-      await delay(0.25 * 1000);
+      await delay(0.15 * 1000);
 
       if (!this.#marked[w]) {
         this.#edgeTo[w] = v;
@@ -54,22 +57,25 @@ export class GraphDFP {
 
         await this.#dfs(w);
       }
+
+      this.#vertexTraversed = this.#graph.vertices[v];
     }
   }
 
   async startProcessing() {
-    this.#shouldProcess = true;
+    this.#shouldTraverse = true;
     const n = this.#graph.verticesCount;
-    
+
     for (let v = 0; v < n; v++) {
       if (!this.#marked[v]) {
         await this.#dfs(v);
       }
     }
+    this.#vertexTraversed = undefined;
   }
 
   stopProcessing() {
-    this.#shouldProcess = false;
+    this.#shouldTraverse = false;
   }
 
   #drawLoop(cvs: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
@@ -78,14 +84,18 @@ export class GraphDFP {
     for (const edge of this.#graph.edges) {
       if (edge.marked) {
         // Draw visited edge
-        edge.draw(ctx, {strokeStyle: darkGrey});
+        edge.draw(ctx, { strokeStyle: darkGrey });
       } else {
         edge.draw(ctx);
       }
     }
 
     for (const vertex of this.#graph.vertices) {
-      vertex.draw(ctx);
+      if (this.#vertexTraversed === vertex) {
+        vertex.drawAsBeingVisited(ctx);
+      } else {
+        vertex.draw(ctx);
+      }
     }
 
     this.#drawingLoopHandle = requestAnimationFrame(() => {
@@ -94,9 +104,9 @@ export class GraphDFP {
   }
 
   startDrawing(canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) {
-      throw new Error('Failed to get 2d context from canvas');
+      throw new Error("Failed to get 2d context from canvas");
     }
     this.#drawLoop(canvas, ctx);
   }

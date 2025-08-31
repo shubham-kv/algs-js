@@ -1,3 +1,5 @@
+import { darkGrey } from "../../constants";
+
 type VertexCtxStyles = {
   lineWidth: number;
   fillStyle: string | CanvasGradient | CanvasPattern;
@@ -45,6 +47,11 @@ export class GraphVertex {
       : this.styles.markedStrokeStyle;
   }
 
+  #applyVisitingVertexStyles(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = darkGrey;
+    ctx.strokeStyle = darkGrey;
+  }
+
   #applyLabelStyles(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = !this.marked
       ? this.styles.strokeStyle
@@ -55,19 +62,38 @@ export class GraphVertex {
     ctx.font = "700 1rem sans-serif";
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  #applyVisitingLabelStyles(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = 'white';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "700 1rem sans-serif";
+  }
+
+  draw(ctx: CanvasRenderingContext2D, visited?: boolean) {
     ctx.save();
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
     ctx.closePath();
-    this.#applyVertexStyles(ctx);
+    if (visited) {
+      this.#applyVisitingVertexStyles(ctx);
+    } else {
+      this.#applyVertexStyles(ctx);
+    }
     ctx.fill();
     ctx.stroke();
     ctx.restore();
 
     ctx.save();
-    this.#applyLabelStyles(ctx);
+    if (visited) {
+      this.#applyVisitingLabelStyles(ctx);
+    } else {
+      this.#applyLabelStyles(ctx);
+    }
     ctx.fillText(this.label ?? "", this.x, this.y);
     ctx.restore();
+  }
+
+  drawAsBeingVisited(ctx: CanvasRenderingContext2D) {
+    this.draw(ctx, true);
   }
 }
