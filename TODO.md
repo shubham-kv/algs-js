@@ -1,6 +1,11 @@
 
 # TODO
 
+## `Mon, 01 Sep 2025 17:04:51 +0530`
+
+- [x] Add Linked Stack data structure  
+- [ ] Make changes to DFS Graph to simulate recursion with stack
+
 ## `Sun, 31 Aug 2025 10:56:22 +0530`
 
 - [ ] Draw growing edges for Depth First Search Graph visualization  
