@@ -1,7 +1,9 @@
+import { LinkedStack } from "@lib/algo/stack";
+
 import { Graph } from "./Graph";
-import { delay } from "../../utils/time";
-import { darkGrey } from "../../constants";
-import { clearCanvas } from "../../utils/canvas";
+import { delay } from "@/graph-dfs/utils/time";
+import { darkGrey } from "@/graph-dfs/constants";
+import { clearCanvas } from "@/graph-dfs/utils/canvas";
 import type { GraphVertex } from "./GraphVertex";
 
 type GraphDFPConfig = {
@@ -29,36 +31,35 @@ export class GraphDFP {
     this.#edgeTo = Array(n).fill(-1);
   }
 
-  async #dfs(v: number) {
+  async #dfs(s: number) {
     if (!this.#shouldTraverse) {
       return;
     }
 
-    if (!this.#graph.isVertexInRange(v)) {
-      throw new Error(`Vertex ${v} is out of range`);
+    if (!this.#graph.isVertexInRange(s)) {
+      throw new Error(`Vertex ${s} is out of range`);
     }
 
-    this.#marked[v] = true; // local array for fast access
-    this.#vertexTraversed = this.#graph.vertices[v];
-    this.#graph.vertices[v].marked = true;
+    const delayMs = 0.3 * 1000;
+    const stack = new LinkedStack<number>();
+    stack.push(s);
 
-    for (const w of this.#graph.adjList(v)) {
-      await delay(0.15 * 1000);
+    while (!stack.isEmpty) {
+      await delay(delayMs);
+      const v = stack.pop()!;
 
-      if (!this.#marked[w]) {
-        this.#edgeTo[w] = v;
+      if (!this.#marked[v]) {
+        this.#marked[v] = true; // local array for fast access
+        this.#vertexTraversed = this.#graph.vertices[v];
+        this.#graph.vertices[v].marked = true;
 
-        const edge = this.#graph.edges.find(
-          (edge) =>
-            (edge.vertexV.index === v && edge.vertexW.index === w) ||
-            (edge.vertexV.index === w && edge.vertexW.index === v)
-        );
-        edge && (edge.marked = true);
-
-        await this.#dfs(w);
+        for (const w of this.#graph.adjList(v)) {
+          if (!this.#marked[w]) {
+            this.#edgeTo[w] = v;
+            stack.push(w);
+          }
+        }
       }
-
-      this.#vertexTraversed = this.#graph.vertices[v];
     }
   }
 
@@ -82,11 +83,22 @@ export class GraphDFP {
     clearCanvas(cvs);
 
     for (const edge of this.#graph.edges) {
-      if (edge.marked) {
-        // Draw visited edge
+      edge.draw(ctx);
+    }
+
+    for (let w = 0; w < this.#graph.verticesCount; w++) {
+      if (this.#edgeTo[w] < 0) {
+        continue;
+      }
+
+      const v = this.#edgeTo[w];
+      const edge = this.#graph.edges.find(
+        (edge) =>
+          (edge.vertexV.index === v && edge.vertexW.index === w) ||
+          (edge.vertexV.index === w && edge.vertexW.index === v)
+      );
+      if (edge && (edge.vertexV.marked && edge.vertexW.marked)) {
         edge.draw(ctx, { strokeStyle: darkGrey });
-      } else {
-        edge.draw(ctx);
       }
     }
 
