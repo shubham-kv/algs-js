@@ -1,6 +1,12 @@
 
 # TODO
 
+## `Tue, 02 Sep 2025 14:35:40 +0530`
+
+- [ ] To increase user interactivity, make DFS Graph visualization step-able to
+  allow play, pause, go to previous step, go to next step, etc. (Currently it
+  does all the processing in one go).
+
 ## `Mon, 01 Sep 2025 17:04:51 +0530`
 
 - [x] Add Linked Stack data structure
@@ -15,5 +21,6 @@
 - [ ] Add ability to randomly generate graph for DFS Graph visualization  
     `Status`: `TRIED`, `ON_HOLD`  
     `Comments`: Made progress, but the vertices & edges were sticking close to one
-    another and I had the adjust the graph to make it look cleaner
+    another and I had to adjust the graph to make it look cleaner
 - [ ] Add Breadth First Search visualization
+
