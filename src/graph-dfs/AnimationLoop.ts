@@ -2,12 +2,12 @@
 type AnimateCallback = (onComplete: Function) => void | Promise<void>;
 
 export class AnimationLoop {
-  #animateCb: AnimateCallback;
+  #animateFn: AnimateCallback;
   #isRunning: boolean = false;
   #frameHandle: number = 0;
 
-  constructor(animateCb: AnimateCallback) {
-    this.#animateCb = animateCb;
+  constructor(animateFn: AnimateCallback) {
+    this.#animateFn = animateFn;
   }
 
   get isRunning(): boolean {
@@ -22,20 +22,18 @@ export class AnimationLoop {
     const onComplete = () => {
       this.stop();
     };
-    await this.#animateCb(onComplete);
+    await this.#animateFn(onComplete);
 
     if (!this.#isRunning) {
       return;
     }
 
-    this.#frameHandle = requestAnimationFrame(() => {
-      this.#loop();
-    });
+    this.#frameHandle = requestAnimationFrame(this.#loop);
   }
 
   start(): void {
     this.#isRunning = true;
-    this.#loop();
+    this.#frameHandle = requestAnimationFrame(this.#loop);
   }
 
   stop(): void {
